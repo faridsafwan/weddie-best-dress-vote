@@ -97,8 +97,8 @@ export default {
       const chart = echarts.init(this.$refs.chart);
       chart.setOption({
         title: {
-          text: "Voting Results",
-          subtext: "Number of Votes for Each Dress",
+          // text: "Voting Results",
+          // subtext: "Number of Votes for Each Dress",
           x: "center",
         },
         // tooltip: {
@@ -117,6 +117,11 @@ export default {
             name: "Votes",
             type: "bar",
             data: chartData,
+            label: {
+              show: true,
+              position: "top", // You can adjust the position as needed
+              formatter: "{c}", // Display the value of the bar
+            },
           },
         ],
       });
