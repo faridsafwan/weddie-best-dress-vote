@@ -1,83 +1,140 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <v-card class="logo py-4 d-flex justify-center">
-        <NuxtLogo />
-        <VuetifyLogo />
-      </v-card>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div>
+    <div style="height: 10vh">
+      <h1>Best Dress Award</h1>
+    </div>
+    <div style="display: flex; justify-content: space-evenly; height: 50vh">
+      <div v-for="dress in dresses" :key="dress.id">
+        <img
+          :src="dress.imageUrl"
+          alt="Dress Image"
+          style="max-width: 200px; margin-bottom: 10px"
+        />
+        <h3>{{ dress.name }}</h3>
+        <h5>{{ dress.wearer }}</h5>
+        <p>Votes: {{ dress.votes }}</p>
+      </div>
+    </div>
+    <div>
+      <div ref="chart" style="height: 40vh"></div>
+    </div>
+  </div>
 </template>
 
 <script>
+import * as echarts from "echarts";
+import io from "socket.io-client";
+
 export default {
-  name: 'IndexPage'
-}
+  data() {
+    return {
+      dresses: [],
+    };
+  },
+
+  async mounted() {
+    await this.fetchDresses();
+    // Establish WebSocket connection
+    const socket = io("http://localhost:3030");
+
+    // Listen for real-time updates
+    socket.on("updateVotes", (data) => {
+      // Handle the real-time update, e.g., update the local state
+      console.log("Real-time update received:", data);
+      this.fetchDresses(); // You might want to refresh the entire list or update only the relevant dress
+    });
+
+    this.$nextTick(() => {
+      this.renderChart();
+    });
+
+    // Listen for the "F" key press to toggle fullscreen
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "F" || event.key === "f") {
+        this.toggleFullscreen();
+      }
+    });
+  },
+
+  watch: {
+    dresses: {
+      handler: "renderChart",
+      deep: true,
+    },
+  },
+
+  methods: {
+    async fetchDresses() {
+      try {
+        const response = await this.$axios.get("/dresses");
+        this.dresses = response.data;
+      } catch (error) {
+        console.error("Error fetching dresses:", error);
+      }
+    },
+
+    async voteForDress(dressId) {
+      try {
+        await this.$axios.post(`/dresses/${dressId}/vote`);
+        await this.fetchDresses(); // Refresh the dress list after voting
+      } catch (error) {
+        console.error("Error voting for dress:", error);
+      }
+    },
+
+    renderChart() {
+      const chartData = this.dresses.map((dress) => ({
+        name: dress.name,
+        value: dress.votes,
+      }));
+
+      const chart = echarts.init(this.$refs.chart);
+      chart.setOption({
+        title: {
+          text: "Voting Results",
+          subtext: "Number of Votes for Each Dress",
+          x: "center",
+        },
+        // tooltip: {
+        //   trigger: "item",
+        //   formatter: "{a} <br/>{b} : {c} ({d}%)",
+        // },
+        xAxis: {
+          type: "category",
+          data: this.dresses.map((dress) => dress.name),
+        },
+        yAxis: {
+          type: "value",
+        },
+        series: [
+          {
+            name: "Votes",
+            type: "bar",
+            data: chartData,
+          },
+        ],
+      });
+    },
+
+    toggleFullscreen() {
+      this.fullscreen = !this.fullscreen;
+
+      // Use the Fullscreen API to toggle fullscreen mode
+      if (this.fullscreen) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    },
+  },
+};
 </script>
+
+<style>
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+</style>

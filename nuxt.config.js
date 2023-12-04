@@ -9,8 +9,8 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - weddie-best-dress-vote',
-    title: 'weddie-best-dress-vote',
+    titleTemplate: '%s - MLNG Best Dress Award',
+    title: 'MLNG Best Dress Award',
     htmlAttrs: {
       lang: 'en'
     },
@@ -44,7 +44,12 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    '@nuxtjs/axios',
   ],
+
+  axios: {
+    baseURL: 'http://localhost:3030', // Used as fallback if no runtime config is provided
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
