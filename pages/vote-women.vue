@@ -1,6 +1,11 @@
 <template>
   <v-container>
-    <v-row justify="center">
+    <!-- If the user has voted, show the thank you page -->
+    <div v-if="hasVotedWomen">
+      <h1>Thank You for Voting!</h1>
+      <p>We appreciate your participation.</p>
+    </div>
+    <v-row v-else justify="center">
       <v-col v-for="dress in dresses" :key="dress.id" cols="12" sm="6" md="4">
         <v-card>
           <v-img
@@ -28,11 +33,14 @@ export default {
   data() {
     return {
       dresses: [],
+      hasVotedWomen: JSON.parse(localStorage.getItem("hasVotedWomen")) || false,
     };
   },
 
   async mounted() {
-    await this.fetchDresses();
+    if (!this.hasVotedWomen) {
+      await this.fetchDresses();
+    }
   },
 
   methods: {
@@ -48,8 +56,20 @@ export default {
 
     async voteForDress(dressId) {
       try {
+        // Check if the user has already voted
+        if (this.hasVotedWomen) {
+          console.log("You have already voted!");
+          return;
+        }
+
+        // If not, proceed with the vote
         await this.$axios.post(`/dresses/${dressId}/vote`);
-        await this.fetchDresses(); // Refresh the dress list after voting
+
+        // Set a flag in localStorage to indicate that the user has voted
+        localStorage.setItem("hasVotedWomen", JSON.stringify(true));
+
+        // Update the local data property
+        this.hasVotedWomen = true;
       } catch (error) {
         console.error("Error voting for dress:", error);
       }

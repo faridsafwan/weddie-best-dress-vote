@@ -1,6 +1,11 @@
 <template>
   <v-container>
-    <v-row justify="center">
+    <!-- If the user has voted, show the thank you page -->
+    <div v-if="hasVotedMen">
+      <h1>Thank You for Voting!</h1>
+      <p>We appreciate your participation.</p>
+    </div>
+    <v-row v-else justify="center">
       <v-col v-for="dress in dresses" :key="dress.id" cols="12" sm="6" md="4">
         <v-card>
           <v-img
@@ -28,18 +33,22 @@ export default {
   data() {
     return {
       dresses: [],
+      hasVotedMen: JSON.parse(localStorage.getItem("hasVotedMen")) || false,
     };
   },
 
   async mounted() {
-    await this.fetchDresses();
+    if (!this.hasVotedMen) {
+      await this.fetchDresses();
+    }
   },
 
   methods: {
     async fetchDresses() {
       try {
         const response = await this.$axios.get("/dresses");
-        this.dresses = response.data;
+        let dress = response.data.filter((e) => e.gender === "male");
+        this.dresses = dress;
       } catch (error) {
         console.error("Error fetching dresses:", error);
       }
@@ -47,8 +56,20 @@ export default {
 
     async voteForDress(dressId) {
       try {
+        // Check if the user has already voted
+        if (this.hasVotedMen) {
+          console.log("You have already voted!");
+          return;
+        }
+
+        // If not, proceed with the vote
         await this.$axios.post(`/dresses/${dressId}/vote`);
-        await this.fetchDresses(); // Refresh the dress list after voting
+
+        // Set a flag in localStorage to indicate that the user has voted
+        localStorage.setItem("hasVotedMen", JSON.stringify(true));
+
+        // Update the local data property
+        this.hasVotedMen = true;
       } catch (error) {
         console.error("Error voting for dress:", error);
       }
