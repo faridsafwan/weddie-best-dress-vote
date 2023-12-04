@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="height: 10vh">
-      <h1>MLNG Best Dress Award (Men)</h1>
+      <h1>MLNG Best Dress Award (Women)</h1>
     </div>
     <div style="display: flex; justify-content: space-evenly; height: 50vh">
       <div v-for="dress in dresses" :key="dress.id">
@@ -44,8 +44,8 @@ export default {
     // Listen for real-time updates
     socket.on("updateVotes", (data) => {
       // Handle the real-time update, e.g., update the local state
-      let dress = data.filter((e) => e.gender === "male");
       console.log("Real-time update received:", data);
+      let dress = data.filter((e) => e.gender === "female");
       this.dresses = dress;
     });
 
@@ -72,7 +72,7 @@ export default {
     async fetchDresses() {
       try {
         const response = await this.$axios.get("/dresses");
-        let dress = response.data.filter((e) => e.gender === "male");
+        let dress = response.data.filter((e) => e.gender === "female");
         this.dresses = dress;
       } catch (error) {
         console.error("Error fetching dresses:", error);
@@ -97,8 +97,8 @@ export default {
       const chart = echarts.init(this.$refs.chart);
       chart.setOption({
         title: {
-          text: "Voting Results",
-          subtext: "Number of Votes for Each Dress",
+          // text: "Voting Results",
+          // subtext: "Number of Votes for Each Dress",
           x: "center",
         },
         // tooltip: {
@@ -117,6 +117,11 @@ export default {
             name: "Votes",
             type: "bar",
             data: chartData,
+            label: {
+              show: true,
+              position: "top", // You can adjust the position as needed
+              formatter: "{c}", // Display the value of the bar
+            },
           },
         ],
       });
