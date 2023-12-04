@@ -48,7 +48,10 @@ export default {
   ],
 
   axios: {
-    baseURL: 'http://localhost:3030', // Used as fallback if no runtime config is provided
+    baseURL:
+      process.env.NODE_ENV === 'production'
+        ? 'https://mlng-best-dress-backend.onrender.com'
+        : 'http://localhost:3030',
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

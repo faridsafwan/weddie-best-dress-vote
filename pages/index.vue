@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="height: 10vh">
-      <h1>Best Dress Award</h1>
+      <h1>MLNG Best Dress Award (Men)</h1>
     </div>
     <div style="display: flex; justify-content: space-evenly; height: 50vh">
       <div v-for="dress in dresses" :key="dress.id">
