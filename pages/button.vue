@@ -3,7 +3,6 @@
     <button
       ref="button"
       class="dummy-button"
-      @click="handleButtonClick"
       @touchstart="handleButtonTouchStart"
       @touchend="handleButtonTouchEnd"
     >
@@ -27,7 +26,7 @@ export default {
       // Add styles for touch end if needed
       console.log("Touch end");
       // Trigger the button click
-      this.handleButtonClick();
+      // this.handleButtonClick();
       this.$refs.button.classList.remove("touch-active");
     },
   },
