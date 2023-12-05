@@ -52,12 +52,6 @@ export default {
 }
 
 .dummy-button {
-  position: relative;
-  display: inline-block;
-  margin: 20px;
-}
-
-.dummy-button {
   color: white;
   font-family: Helvetica, sans-serif;
   font-weight: bold;
@@ -102,7 +96,7 @@ export default {
   bottom: -15px;
   left: -4px;
   z-index: -1;
-  background-color: #2b1800;
+  background-color: red;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
