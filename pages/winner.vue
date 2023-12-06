@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      MLNG 45TH ANNIVERSARY | LIST OF LUCKY DRAW (5th December 2023)
+      MLNG 45TH ANNIVERSARY | LIST OF LUCKY DRAW (6th December 2023)
     </v-card-title>
     <v-data-table
       :headers="headers"
